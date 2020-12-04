@@ -47,8 +47,6 @@ namespace CoreCodeCamp
             app.UseRouting();
 
             //app.UseMiddleware<FeatureSwitchAuthMiddleware>();
-            
-
             app.UseAuthentication();
             app.UseAuthorization();
 
