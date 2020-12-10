@@ -1,29 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using System.Threading.Tasks;
 using AutoMapper;
 using CoreCodeCamp.Data;
-using CoreCodeCamp.Middleware;
-using CoreCodeCamp.Profiles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CoreCodeCamp
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen();
-            services.AddDbContext<CampContext>();
+            services.AddDbContext<CampContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DbServer")));
             services.AddScoped<ICampRepository, CampRepository>();
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddControllers();
@@ -33,7 +32,6 @@ namespace CoreCodeCamp
         {
 
             //app.UseMiddleware<FeatureSwitchMiddleware>();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -49,6 +47,8 @@ namespace CoreCodeCamp
             //app.UseMiddleware<FeatureSwitchAuthMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            PrepDB.PrepPopulation(app);
 
             app.UseEndpoints(cfg =>
             {

@@ -1,0 +1,16 @@
+version: '3.4'
+
+services: 
+  sqlserverDB:
+    image: microsoft/mssql-server-linux:2017-latest
+    environment: 
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Passw0rd"
+    ports: 
+      - "1433:1433"
+  corecodecamp:
+    build: .
+    environment: 
+      DBServer: "sqlserverDB"
+    ports: 
+      - "8080:80"
